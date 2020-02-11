@@ -78,9 +78,7 @@ class HashTable:
             print(f"Warning key ({key}) not found.")
         return
 
-
-
-    def retrieve(self, key):
+        def retrieve(self, key):
         '''
         Retrieve the value stored with the given key.
 
