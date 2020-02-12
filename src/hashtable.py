@@ -52,11 +52,32 @@ class HashTable:
         Fill this in.
         '''
         index = self._hash_mod(key)
-        if self.storage[index] is not None:
-            print(f"WARNING:  Collision has occured at {index}")
+
+        new_pair = LinkedPair(key, value)
+
+        if self.storage[index]:
+            current_node = self.storage[index]
+
+            if current_node.key == key:
+                current_node.value = value
+            else:
+                missing = True
+                next_node = current_node.next
+
+                while next_node:
+                    current_node = next_node
+                    next_node = current_node.next
+
+                    if current_node.key == key:
+                        current_node.value = value
+                        missing = False
+
+                if missing is True:
+                    current_node.next = new_pair
         else:
-            self.storage[index] = (key, value)
-        return
+            self.storage[index] = new_pair
+
+
 
 
 
@@ -69,16 +90,23 @@ class HashTable:
         Fill this in.
         '''
         index = self._hash_mod(key)
-        if self.storage[index] is not None:
-            if self.storage[index][0] == key:
-                self.storage[index] = None
-            else:
-                print(f"WARNING:  Collision has occured at {index}")
-        else:
-            print(f"Warning key ({key}) not found.")
-        return
 
-        def retrieve(self, key):
+        if self.storage[index]:
+            current_node = self.storage[index]
+
+            if current_node.key == key:
+                self.storage[index] = current_node.next
+            else:
+                next_node = current_node.next
+
+                while next_node:
+                    prev_node = current_node
+                    current_node = next_node
+                    next_node = current_node.next
+
+                    if current_node.key == key:
+                        prev_node.next = next_node
+    def retrieve(self, key):
         '''
         Retrieve the value stored with the given key.
 
@@ -87,14 +115,24 @@ class HashTable:
         Fill this in.
         '''
         index = self._hash_mod(key)
-        if self.storage[index] is not None:
-            if self.storage[index][0] == key:
-                return self.storage[index][1]
+
+        if self.storage[index]:
+            current_node = self.storage[index]
+
+            if current_node.key == key:
+                return current_node.value
             else:
-                print(f"WARNING:  Collision has occured at {index}")
+                next_node = current_node.next
+
+                while next_node:
+                    current_node = next_node
+                    next_node = current_node.next
+
+                    if current_node.key == key:
+                        return current_node.value
         else:
             return None
-        return
+
 
 
     def resize(self):
@@ -105,10 +143,20 @@ class HashTable:
         Fill this in.
         '''
         old_storage = self.storage
-        self.capacity *= 2
+        self.capacity = 2 * len(self.storage)
         self.storage = [None] * self.capacity
-        for item in old_storage:
-            self.insert(item[0], item[1])
+
+        for i in range(0, len(old_storage)):
+            if old_storage[i]:
+                current_node = old_storage[i]
+                self.insert(current_node.key, current_node.value)
+
+                next_node = current_node.next
+                while next_node:
+                    self.insert(next_node.key, next_node.value)
+                    current_node = next_node
+                    next_node = current_node.next
+
 
 
 
